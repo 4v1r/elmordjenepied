@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jeu de Drag & Drop</title>
+    <title>elmordjenepied.click</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body, html {
@@ -143,7 +143,6 @@
         }
 
         function startRandomMovement() {
-            // Clear any existing interval
             if (movementInterval) {
                 clearInterval(movementInterval);
             }
@@ -206,16 +205,15 @@
             gameContainer.classList.toggle('dark-mode');
             if (isDarkMode) {
                 gameContainer.style.backgroundColor = '#1a1a1a';
-                themeToggle.textContent = 'CLAIR';
+                themeToggle.textContent = 'LIGHT';
             } else {
                 gameContainer.style.backgroundColor = '#f0f0f0';
-                themeToggle.textContent = 'SOMBRE';
+                themeToggle.textContent = 'DARK';
             }
         });
 
         window.addEventListener('resize', resetPositions);
 
-        // Nettoyage de l'intervalle lors du redimensionnement
         window.addEventListener('resize', () => {
             if (movementInterval) {
                 clearInterval(movementInterval);
@@ -223,7 +221,6 @@
             resetPositions();
         });
 
-        // Initialisation
         resetPositions();
         themeToggle.textContent = 'SOMBRE';
     </script>
