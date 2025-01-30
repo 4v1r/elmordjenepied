@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>elmordjenepied.click</title>
+    <title>elmordjenepied.click (v0.1.1)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body, html {
@@ -78,7 +78,6 @@
             width: 100px;
             height: 100px;
             user-select: none;
-            transition: all 2s ease-in-out;
         }
         
         #draggable {
@@ -86,13 +85,7 @@
             width: 100px;
             height: 100px;
             cursor: move;
-            transition: transform 0.1s;
-            -webkit-user-drag: element;
-            user-select: auto;
-        }
-
-        #draggable:hover {
-            transform: scale(1.05);
+            touch-action: none;
         }
 
         .score-animation {
@@ -114,8 +107,8 @@
                 <div id="score">SCORE: 0</div>
             </div>
         </div>
-        <img id="target" src="png1.png" draggable="false">
-        <img id="draggable" src="png2.png" draggable="true">
+        <img id="target" src="png1.png">
+        <img id="draggable" src="png2.png">
     </div>
 
     <script>
@@ -128,53 +121,112 @@
         let score = 0;
         let isDarkMode = false;
         let movementInterval = null;
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
 
-        function moveRandomly(element) {
-            const maxX = window.innerWidth - element.offsetWidth;
-            const maxY = window.innerHeight - element.offsetHeight;
+        function moveTarget() {
+            const maxX = window.innerWidth - target.offsetWidth;
+            const maxY = window.innerHeight - target.offsetHeight;
             const padding = 50;
             
             const newX = padding + Math.random() * (maxX - 2 * padding);
             const newY = padding + Math.random() * (maxY - 2 * padding);
             
-            element.style.transition = 'all 2s ease-in-out';
-            element.style.left = newX + 'px';
-            element.style.top = newY + 'px';
+            target.style.transition = 'all 1s ease-in-out';
+            target.style.left = newX + 'px';
+            target.style.top = newY + 'px';
         }
 
-        function startRandomMovement() {
+        function startTargetMovement() {
             if (movementInterval) {
                 clearInterval(movementInterval);
             }
 
+            let interval;
             if (score >= 15) {
-                movementInterval = setInterval(() => moveRandomly(target), 2000); // Rapide
+                interval = 1000;
             } else if (score >= 10) {
-                movementInterval = setInterval(() => moveRandomly(target), 3000); // Moyen
+                interval = 2000;
             } else if (score >= 5) {
-                movementInterval = setInterval(() => moveRandomly(target), 4000); // Lent
+                interval = 3000;
             }
-        }
 
-        function updateTargetMovement() {
-            if (score >= 5) {
-                startRandomMovement();
+            if (interval) {
+                moveTarget();
+                movementInterval = setInterval(moveTarget, interval);
             }
-        }
-
-        function randomPosition(element) {
-            const maxX = window.innerWidth - element.offsetWidth;
-            const maxY = window.innerHeight - element.offsetHeight;
-            const padding = 50;
-            
-            element.style.left = (padding + Math.random() * (maxX - 2 * padding)) + 'px';
-            element.style.top = (padding + Math.random() * (maxY - 2 * padding)) + 'px';
         }
 
         function resetPositions() {
-            randomPosition(target);
-            randomPosition(draggable);
-            updateTargetMovement();
+            xOffset = 0;
+            yOffset = 0;
+            draggable.style.transform = 'translate(0px, 0px)';
+            
+            const maxX = window.innerWidth - draggable.offsetWidth;
+            const maxY = window.innerHeight - draggable.offsetHeight;
+            const padding = 50;
+            
+            draggable.style.left = (padding + Math.random() * (maxX - 2 * padding)) + 'px';
+            draggable.style.top = (padding + Math.random() * (maxY - 2 * padding)) + 'px';
+            
+            if (score < 5) {
+                target.style.left = (window.innerWidth / 2 - target.offsetWidth / 2) + 'px';
+                target.style.top = (window.innerHeight / 2 - target.offsetHeight / 2) + 'px';
+            } else {
+                target.style.left = (padding + Math.random() * (maxX - 2 * padding)) + 'px';
+                target.style.top = (padding + Math.random() * (maxY - 2 * padding)) + 'px';
+            }
+            
+            startTargetMovement();
+        }
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+
+            if (e.target === draggable) {
+                isDragging = true;
+            }
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                xOffset = currentX;
+                yOffset = currentY;
+
+                draggable.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+
+        function dragEnd(e) {
+            if (isDragging) {
+                const targetRect = target.getBoundingClientRect();
+                const draggableRect = draggable.getBoundingClientRect();
+
+                if (isOverlapping(draggableRect, targetRect)) {
+                    score++;
+                    scoreElement.textContent = `SCORE: ${score}`;
+                    animateScore();
+                    resetPositions();
+                }
+
+                isDragging = false;
+            }
+        }
+
+        function isOverlapping(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                rect1.left > rect2.right || 
+                rect1.bottom < rect2.top || 
+                rect1.top > rect2.bottom);
         }
 
         function animateScore() {
@@ -184,21 +236,9 @@
             }, 500);
         }
 
-        draggable.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text', e.target.id);
-        });
-
-        target.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
-
-        target.addEventListener('drop', (e) => {
-            e.preventDefault();
-            score++;
-            scoreElement.textContent = `SCORE: ${score}`;
-            animateScore();
-            resetPositions();
-        });
+        draggable.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
 
         themeToggle.addEventListener('click', () => {
             isDarkMode = !isDarkMode;
@@ -211,8 +251,6 @@
                 themeToggle.textContent = 'DARK';
             }
         });
-
-        window.addEventListener('resize', resetPositions);
 
         window.addEventListener('resize', () => {
             if (movementInterval) {
