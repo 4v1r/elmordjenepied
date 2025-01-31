@@ -1,9 +1,11 @@
 let canvas = document.createElement("canvas");
 let ctx = canvas.getContext("2d");
 const settingsBtn = document.getElementById('settings-btn');
+const questsBtn = document.getElementById('quests-btn');
 const soundBtn = document.getElementById('sound-btn');
 const themeToggle = document.getElementById('theme-toggle');
 const settingsModal = document.getElementById('settings-modal');
+const questsModal = document.getElementById('quests-modal');
 const codeInput = document.getElementById('code-input');
 const codeMessage = document.getElementById('code-message');
 const backgroundMusic = document.getElementById('background-music');
@@ -11,7 +13,15 @@ const scoreElement = document.getElementById('score');
 
 document.body.appendChild(canvas);
 
-// Variables du jeu
+if (!localStorage.getItem('theme')) {
+    localStorage.setItem('theme', 'dark');
+    document.body.classList.add('dark-mode');
+} else {
+    document.body.classList.toggle('dark-mode', localStorage.getItem('theme') === 'dark');
+}
+
+themeToggle.textContent = document.body.classList.contains('dark-mode') ? 'LIGHT' : 'DARK';
+
 let isSoundOn = false;
 let score = parseInt(localStorage.getItem('gameScore')) || 0;
 scoreElement.textContent = `SCORE: ${score}`;
@@ -26,15 +36,13 @@ let offsetX = 0;
 let offsetY = 0;
 let hitboxReduction = 20;
 
-// Variables pour le mouvement de l'image 1
 let startX = 0;
 let startY = 0;
 let targetX = 0;
 let targetY = 0;
 let moveStartTime = 0;
-let moveDuration = 2000; // 2 secondes en millisecondes
+let moveDuration = 2000;
 
-// Chargement des images
 let img1 = new Image();
 let img2 = new Image();
 let imagesLoaded = 0;
@@ -43,10 +51,8 @@ let gameStarted = false;
 function startGame() {
     if (imagesLoaded === 2) {
         gameStarted = true;
-        // Positionner png1 au centre
         png1X = window.innerWidth / 2 - 50;
         png1Y = window.innerHeight / 2 - 50;
-        // Positionner png2 aléatoirement
         repositionImages();
         gameLoop();
     }
@@ -81,7 +87,6 @@ function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     if (score < 5 && gameStarted) {
-        // Maintenir png1 au centre si score < 5
         png1X = window.innerWidth / 2 - 50;
         png1Y = window.innerHeight / 2 - 50;
     }
@@ -111,14 +116,11 @@ function updateGame() {
         let elapsed = currentTime - moveStartTime;
         let progress = Math.min(elapsed / moveDuration, 1);
         
-        // Appliquer l'easing
         let easedProgress = easeInOutQuad(progress);
         
-        // Mettre à jour la position
         png1X = startX + (targetX - startX) * easedProgress;
         png1Y = startY + (targetY - startY) * easedProgress;
         
-        // Si le mouvement est terminé, définir une nouvelle cible
         if (progress >= 1) {
             setNewTarget();
         }
@@ -145,7 +147,6 @@ function repositionImages() {
     png2Y = Math.random() * (canvas.height - tileSize);
 }
 
-// Gestion du drag and drop de png2
 canvas.addEventListener('mousedown', function(e) {
     let rect = canvas.getBoundingClientRect();
     let mouseX = e.clientX - rect.left;
@@ -165,7 +166,6 @@ canvas.addEventListener('mousemove', function(e) {
         png2X = e.clientX - rect.left + offsetX;
         png2Y = e.clientY - rect.top + offsetY;
 
-        // Garder png2 dans les limites du canvas
         png2X = Math.max(0, Math.min(canvas.width - tileSize, png2X));
         png2Y = Math.max(0, Math.min(canvas.height - tileSize, png2Y));
     }
@@ -198,9 +198,14 @@ canvas.addEventListener('mouseleave', function() {
     isDragging = false;
 });
 
-// Gestion des boutons et autres événements
 settingsBtn.addEventListener('click', () => {
     settingsModal.style.display = settingsModal.style.display === 'block' ? 'none' : 'block';
+    questsModal.style.display = 'none';
+});
+
+questsBtn.addEventListener('click', () => {
+    questsModal.style.display = questsModal.style.display === 'block' ? 'none' : 'block';
+    settingsModal.style.display = 'none';
 });
 
 codeInput.addEventListener('keypress', (e) => {
@@ -237,13 +242,16 @@ soundBtn.addEventListener('click', () => {
 
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    themeToggle.textContent = document.body.classList.contains('dark-mode') ? 'LIGHT' : 'DARK';
 });
 
 document.addEventListener('click', (e) => {
-    if (!settingsModal.contains(e.target) && e.target !== settingsBtn) {
+    if (!settingsModal.contains(e.target) && e.target !== settingsBtn &&
+        !questsModal.contains(e.target) && e.target !== questsBtn) {
         settingsModal.style.display = 'none';
+        questsModal.style.display = 'none';
     }
 });
 
-// Initialisation
 clearScreen();
