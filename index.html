@@ -2,20 +2,30 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>elmordjenepied.click (v0.2.1)</title>
+    <title>elmordjenepied.click (v0.2.3)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="controls-overlay">
-        <button id="settings-btn">SETTINGS</button>
-        <button id="sound-btn">UNMUTE</button>
-        <button id="theme-toggle">MODE</button>
+        <div class="left-controls">
+            <button id="settings-btn">SETTINGS</button>
+            <button id="quests-btn">QUESTS</button>
+        </div>
         <div id="score">SCORE: 0</div>
         <div id="settings-modal" class="modal">
             <div class="modal-content">
+                <div class="settings-buttons">
+                    <button id="sound-btn">UNMUTE</button>
+                    <button id="theme-toggle">MODE</button>
+                </div>
+                <div class="settings-separator"></div>
                 <input type="text" id="code-input" placeholder="ENTER CODE">
                 <div id="code-message"></div>
+            </div>
+        </div>
+        <div id="quests-modal" class="modal">
+            <div class="modal-content">
             </div>
         </div>
     </div>
