@@ -1,0 +1,123 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #fff;
+    transition: background-color 0.3s;
+    cursor: default;
+    user-select: none;
+}
+
+body.dark-mode {
+    background: #1a1a1a;
+}
+
+canvas {
+    display: block;
+}
+
+.controls-overlay {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+#settings-btn, 
+#sound-btn, 
+#theme-toggle {
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.dark-mode #settings-btn,
+.dark-mode #sound-btn,
+.dark-mode #theme-toggle {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#settings-btn:hover, 
+#sound-btn:hover,
+#theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+#score {
+    font-family: 'Press Start 2P', cursive;
+    color: #000;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 2px solid #000;
+    transition: transform 0.2s ease, background-color 0.3s, color 0.3s;
+}
+
+.dark-mode #score {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.8);
+    border-color: #fff;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    z-index: 1001;
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+}
+
+.dark-mode .modal-content {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#code-input {
+    font-family: 'Press Start 2P', cursive;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 10px;
+    width: 200px;
+    border-radius: 5px;
+    outline: none;
+}
+
+#code-input:focus {
+    border-color: #4a9eff;
+}
+
+#code-message {
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    margin-top: 10px;
+    font-size: 12px;
+    min-height: 20px;
+}
+
+/* Animation pour le score */
+@keyframes scorePopup {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.score-animation {
+    animation: scorePopup 0.2s ease-in-out;
+}
